@@ -64,6 +64,16 @@ abstract class WebViewPlatformController {
         "WebView loadUrl is not implemented on the current platform");
   }
 
+  /// Loads the specified asset.
+  ///
+  /// `url` must not be null.
+  ///
+  /// Throws an ArgumentError if `url` is not a valid URL string.
+  Future<void> loadAssetFile(String url) {
+    throw UnimplementedError(
+        "WebView loadAssetFile is not implemented on the current platform");
+  }
+
   /// Updates the webview settings.
   ///
   /// Any non null field in `settings` will be set as the new setting value.
