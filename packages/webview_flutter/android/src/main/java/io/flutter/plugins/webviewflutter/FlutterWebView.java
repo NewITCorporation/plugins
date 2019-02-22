@@ -66,10 +66,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
     }
     if (params.containsKey("initialUrl")) {
       String url = (String) params.get("initialUrl");
-      if (url.contains("://"))
-        webView.loadUrl(url);
-      else
-        webView.loadUrl("file:///android_asset/flutter_assets/" + url);
+      if (url.contains("://")) webView.loadUrl(url);
+      else webView.loadUrl("file:///android_asset/flutter_assets/" + url);
     }
   }
 
