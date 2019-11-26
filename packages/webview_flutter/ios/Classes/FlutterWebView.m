@@ -92,6 +92,8 @@
     NSDictionary<NSString*, id>* settings = args[@"settings"];
 
     WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
+    [configuration.preferences setValue:@"TRUE" forKey:@"allowFileAccessFromFileURLs"];
+    [configuration setValue:@"TRUE" forKey:@"allowUniversalAccessFromFileURLs"];
     configuration.userContentController = userContentController;
     [self updateAutoMediaPlaybackPolicy:args[@"autoMediaPlaybackPolicy"]
                         inConfiguration:configuration];
@@ -395,13 +397,24 @@
 }
 
 - (bool)loadAssetFile:(NSString*)url {
-  NSString* key = [_registrar lookupKeyForAsset:url];
-  NSURL* nsUrl = [[NSBundle mainBundle] URLForResource:key withExtension:nil];
-  if (!nsUrl) {
-    return false;
+  NSArray* array = [url componentsSeparatedByString:@"?"];
+  NSString* pathString = [array objectAtIndex:0];
+  NSLog(@"%@%@", @"pathString: ", pathString);
+  NSString* key = [_registrar lookupKeyForAsset:pathString];
+  NSURL* baseURL = [[NSBundle mainBundle] URLForResource:key withExtension:nil];
+  if (!baseURL) {
+      return false;
+   }
+  NSURL* newUrl = baseURL;
+  if ([array count] > 1) {
+    NSString* queryString = [array objectAtIndex:1];
+    NSLog(@"%@%@", @"queryString: ", queryString);
+    NSString* queryPart = [NSString stringWithFormat:@"%@%@", @"?", queryString];
+    NSLog(@"%@%@", @"queryPart: ", queryPart);
+    newUrl = [NSURL URLWithString:queryPart relativeToURL:baseURL];
   }
   if (@available(iOS 9.0, *)) {
-    [_webView loadFileURL:nsUrl allowingReadAccessToURL:[NSURL URLWithString:@"file:///"]];
+    [_webView loadFileURL:newUrl allowingReadAccessToURL:[NSURL URLWithString:@"file:///"]];
   } else {
     return false;
   }
